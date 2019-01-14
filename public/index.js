@@ -146,6 +146,89 @@ const actors = [{
   }]
 }];
 
+
+
+function BookingPrice(){
+	var timePrice
+	var peoplePrice
+	var totalPrice
+	var totalCommission
+	 for (var i = 0 ; i < events.length ; i++){
+	 	for (var j = 0; j<bars.length ; j++){
+	 		if (events[i].barId == bars[i].id){
+	 			//timePrice
+	 			timePrice = bars[i].pricePerHour * events[i].time
+	 			//peoplePrice
+	 			if(events[i].persons > 60){
+		 			peoplePrice = bars[i].pricePerPerson * events[i].persons * 0.5
+	 				//console.log("reduction 60")
+	 			}
+	 			else if(events[i].persons > 20){
+		 			peoplePrice = bars[i].pricePerPerson * events[i].persons * 0.7
+	 				//console.log("reduction 20")
+	 			}
+	 			else if(events[i].persons > 10){
+		 			peoplePrice = bars[i].pricePerPerson * events[i].persons * 0.9
+	 				//console.log("reduction")
+	 			}
+	 			else {
+	 				peoplePrice = bars[i].pricePerPerson * events[i].persons	 				
+	 			}
+	 			//Deducible Option
+	 			if (events[i].deductibleReduction == true){
+	 				totalPrice = timePrice + peoplePrice + events[i].persons 
+	 			}
+	 			else {
+	 				totalPrice = timePrice + peoplePrice
+	 			} 
+	 			events[i].price = totalPrice
+	 		}
+	 	}
+	 	//Commissions
+	 	totalCommission = events[i].price*0.3
+	 	events[i].insurance = totalCommission *0.5
+	 	events[i].treasury = events[i].persons
+	 	events[i].privateaser = totalCommission*0.5 - events[i].treasury	 	
+	 	//console.log(events[i].price)
+	 }
+}
+
+function Payment(){
+	for (var i =0 ; i<actors.length ; i++){
+		for (var k = 0 ; k<events.length ; k++){
+			if (actors[i].eventId == events[k].id){
+				console.log(events[k])
+				for (var j = 0 ; j< actors[i].payment.length ; j++){
+					
+					if(actors[i].payment[j].who == "booker"){
+						actors[i].payment[j].amount = events[k].price
+					}
+					else if(actors[i].payment[j].who == "bar"){
+						actors[i].payment[j].amount = events[k].price *0.7
+					}
+					else if(actors[i].payment[j].who == "insurance"){
+						actors[i].payment[j].amount = events[k].insurance
+					}
+					else if(actors[i].payment[j].who == "treasury"){
+						actors[i].payment[j].amount = events[k].treasury
+					}
+					else if(actors[i].payment[j].who == "privateaser"){
+						if (events[k].deductibleReduction ==true){
+							actors[i].payment[j].amount = events[k].privateaser + events[k].persons
+						}
+						else{
+							actors[i].payment[j].amount = events[k].privateaser
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+BookingPrice()
+Payment()
+
 console.log(bars);
 console.log(events);
 console.log(actors);
